@@ -29,15 +29,9 @@ jobs:
               with:
                   version: latest
 
-            - name: Allow build scripts in package.json
+            - name: Allow build scripts in pnpm-workspace.yaml
               run: |
-                  node -e '
-                    const fs = require("fs");
-                    const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
-                    pkg.pnpm = pkg.pnpm || {};
-                    pkg.pnpm.onlyBuiltDependencies = ["sharp", "esbuild", "es5-ext"];
-                    fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
-                  '
+                  printf "allowBuilds:\n  sharp: true\n  esbuild: true\n  es5-ext: true\n" >> pnpm-workspace.yaml
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
