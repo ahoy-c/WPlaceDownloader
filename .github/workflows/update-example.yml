@@ -29,13 +29,18 @@ jobs:
               with:
                   version: latest
 
-            - name: Install dependencies
-              env:
-                  npm_config_strict_dep_builds: false
-              run: pnpm install --frozen-lockfile
+            - name: Allow build scripts in package.json
+              run: |
+                  node -e '
+                    const fs = require("fs");
+                    const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+                    pkg.pnpm = pkg.pnpm || {};
+                    pkg.pnpm.onlyBuiltDependencies = ["sharp", "esbuild", "es5-ext"];
+                    fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2));
+                  '
 
-            - name: Rebuild native modules
-              run: pnpm rebuild sharp esbuild
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
             - name: Prepare env
               run: |
