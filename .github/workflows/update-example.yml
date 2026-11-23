@@ -1,8 +1,6 @@
 name: Update Example Image
 
 on:
-    schedule:
-        - cron: '17 */2 * * *'
     workflow_dispatch:
 
 permissions:
