@@ -3,7 +3,7 @@ name: Update Example Image
 on:
     schedule:
         - cron: '0 */2 * * *'
-    workflow_dispatch: # Allow manual triggering
+    workflow_dispatch:
 
 permissions:
     contents: write
@@ -27,10 +27,23 @@ jobs:
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
               with:
-                  version: 9
+                  version: latest
 
             - name: Install dependencies
-              run: pnpm install --frozen-lockfile --config.strict-dep-builds=false
+              env:
+                  npm_config_strict_dep_builds: false
+              run: pnpm install --frozen-lockfile
+
+            - name: Rebuild native modules
+              run: pnpm rebuild sharp esbuild
+
+            - name: Prepare env
+              run: |
+                  if [ -f .env.example ] && [ ! -f .env ]; then
+                    cp .env.example .env
+                  else
+                    touch .env
+                  fi
 
             - name: Build project
               run: pnpm build
